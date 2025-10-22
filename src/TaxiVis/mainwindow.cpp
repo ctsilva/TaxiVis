@@ -27,8 +27,10 @@ MainWindow::MainWindow(QWidget *parent) :
     // QWidget::showMaximized();
 
     // for to start with one map
+#ifndef NO_WEBKIT
     addNewMap();
     ui->mdiArea->subWindowList().front()->showMaximized();
+#endif
 }
 
 MainWindow::~MainWindow()
