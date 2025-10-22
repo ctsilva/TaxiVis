@@ -76,6 +76,8 @@ void TripLocation::initGL()
   if (context) {
     this->shader = PQOpenGLShaderProgram(new QOpenGLShaderProgram());
     this->shader->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/Resources/shaders/location.120.vert");
+    this->shader->bindAttributeLocation("vertex", 0);
+    this->shader->bindAttributeLocation("color", 1);
     this->shader->link();
   }
 }
@@ -112,6 +114,11 @@ void TripLocation::renderGL()
   this->shader->setUniformValue("zoom", (float)this->geoWidget->mapView()->zoomLevel());
   this->shader->setUniformValue("center", this->geoWidget->mapView()->center());
   this->shader->setUniformValue("size", QVector2D(size.width(), size.height()));
+
+  // Set modelViewProjectionMatrix for GLSL 150 core
+  GLfloat matrix[16];
+  glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
+  this->shader->setUniformValue("modelViewProjectionMatrix", QMatrix4x4(matrix));
   
   glEnable(GL_POINT_SMOOTH);
 

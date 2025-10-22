@@ -1,19 +1,21 @@
-#version 120
-#extension GL_EXT_geometry_shader4 : enable
+#version 150 core
+
+layout(triangles) in;
+layout(triangle_strip, max_vertices = 6) out;
 
 uniform int   zoom;
 uniform vec2  scale;
 uniform float time;
 uniform vec2  glyphArea;
 
-varying vec3 tex;
-varying float progress;
+out vec3 tex;
+out float progress;
 
-void main(void) 
-{    
-  vec4 p0 = gl_PositionIn[0];
-  vec4 p1 = gl_PositionIn[1];
-  vec4 p2 = gl_PositionIn[2];
+void main(void)
+{
+  vec4 p0 = gl_in[0].gl_Position;
+  vec4 p1 = gl_in[1].gl_Position;
+  vec4 p2 = gl_in[2].gl_Position;
   float prevTime = time - glyphArea.x;
   bool stopped = ((p2.x==p2.z) && (time<p2.x) ||
                   (p2.y==p2.w) && (time>p2.y));

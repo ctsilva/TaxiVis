@@ -261,6 +261,7 @@ void TripAnimation::initGL()
     sh->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/Resources/shaders/paths.120.vert");
     sh->addShaderFromSourceFile(QOpenGLShader::Geometry, ":/Resources/shaders/paths.120.geom");
     sh->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/Resources/shaders/paths.120.frag");
+    sh->bindAttributeLocation("pos", 0);
     // Note: setGeometryInputType/OutputType removed in Qt5 - configure in shader instead
     // sh->setGeometryInputType(GL_TRIANGLES);
     // sh->setGeometryOutputType(GL_TRIANGLE_STRIP);
