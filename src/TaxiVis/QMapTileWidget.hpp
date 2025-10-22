@@ -60,7 +60,6 @@ signals:
 
 public slots:
   void updateView();
-  void tileDownloaded();
 
 protected:
   void initGL();
@@ -78,6 +77,10 @@ private:
   void loadTile(int x, int y, int z);
   void loadVisibleTiles();
   QPointF latLonToTilePixel(double lat, double lon, int zoom) const;
+  QString getTileCachePath() const;
+  QString getTileCacheFilePath(int x, int y, int z) const;
+  bool loadTileFromDisk(int x, int y, int z);
+  void saveTileToDisk(int x, int y, int z, const QPixmap &pixmap);
 
   bool         glInitialized;
   bool         showMapEnabled;
@@ -91,6 +94,7 @@ private:
   QMapWidget  *mapWidget;
 
   QString      tileServerUrl;
+  QString      tileCachePath;
   QNetworkAccessManager *networkManager;
   QCache<QString, MapTile> tileCache;
 

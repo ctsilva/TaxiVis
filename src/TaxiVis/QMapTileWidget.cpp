@@ -6,6 +6,9 @@
 #include <QMouseEvent>
 #include <QStyleOptionGraphicsItem>
 #include <QPainter>
+#include <QStandardPaths>
+#include <QDir>
+#include <QFile>
 #include <cmath>
 
 // RenderingLayerManager implementation (shared with original QMapView)
@@ -169,11 +172,42 @@ QMapTileWidget::QMapTileWidget(QPointF coords, int level, QWidget *parent)
 
   // Initialize network manager for tile downloads
   this->networkManager = new QNetworkAccessManager(this);
-  connect(this->networkManager, SIGNAL(finished(QNetworkReply*)),
-          this, SLOT(tileDownloaded()));
+  connect(this->networkManager, &QNetworkAccessManager::finished,
+          [this](QNetworkReply *reply) {
+    QString key = reply->request().attribute(QNetworkRequest::User).toString();
+
+    if (reply->error() == QNetworkReply::NoError) {
+      QByteArray data = reply->readAll();
+      QPixmap pixmap;
+      pixmap.loadFromData(data);
+
+      MapTile *tile = this->tileCache.object(key);
+      if (tile && !pixmap.isNull()) {
+        tile->pixmap = pixmap;
+        tile->loading = false;
+
+        // Save tile to disk cache for future use
+        QStringList parts = key.split('_');
+        if (parts.size() == 3) {
+          int z = parts[0].toInt();
+          int x = parts[1].toInt();
+          int y = parts[2].toInt();
+          this->saveTileToDisk(x, y, z, pixmap);
+        }
+
+        this->update();
+      }
+    }
+
+    reply->deleteLater();
+  });
 
   // Set cache size (100 tiles * ~50KB each = ~5MB)
   this->tileCache.setMaxCost(100);
+
+  // Initialize disk cache directory
+  this->tileCachePath = QStandardPaths::writableLocation(QStandardPaths::CacheLocation) + "/tiles";
+  QDir().mkpath(this->tileCachePath);
 
   // Set flags for proper rendering
   this->setFlag(QGraphicsItem::ItemUsesExtendedStyleOption, true);
@@ -295,21 +329,63 @@ void QMapTileWidget::loadVisibleTiles()
   }
 }
 
+QString QMapTileWidget::getTileCacheFilePath(int x, int y, int z) const
+{
+  return QString("%1/%2/%3/%4.png").arg(this->tileCachePath).arg(z).arg(x).arg(y);
+}
+
+bool QMapTileWidget::loadTileFromDisk(int x, int y, int z)
+{
+  QString filePath = getTileCacheFilePath(x, y, z);
+  if (!QFile::exists(filePath))
+    return false;
+
+  QPixmap pixmap(filePath);
+  if (pixmap.isNull())
+    return false;
+
+  MapTile tile(x, y, z);
+  QString key = tile.key();
+
+  MapTile *newTile = new MapTile(x, y, z);
+  newTile->pixmap = pixmap;
+  newTile->loading = false;
+  this->tileCache.insert(key, newTile, 1);
+
+  qDebug() << "Loaded tile from disk:" << filePath;
+  return true;
+}
+
+void QMapTileWidget::saveTileToDisk(int x, int y, int z, const QPixmap &pixmap)
+{
+  QString filePath = getTileCacheFilePath(x, y, z);
+  QFileInfo fileInfo(filePath);
+  QDir().mkpath(fileInfo.absolutePath());
+
+  pixmap.save(filePath, "PNG");
+}
+
 void QMapTileWidget::loadTile(int x, int y, int z)
 {
   MapTile tile(x, y, z);
   QString key = tile.key();
 
-  // Check if tile is already in cache
+  // Check if tile is already in memory cache
   if (this->tileCache.contains(key))
     return;
+
+  // Try to load from disk cache first
+  if (loadTileFromDisk(x, y, z)) {
+    this->update();
+    return;
+  }
 
   // Create placeholder tile
   MapTile *newTile = new MapTile(x, y, z);
   newTile->loading = true;
   this->tileCache.insert(key, newTile, 1);
 
-  // Download tile
+  // Download tile from network
   QString url = this->tileServerUrl;
   url.replace("{z}", QString::number(z));
   url.replace("{x}", QString::number(x));
@@ -322,29 +398,6 @@ void QMapTileWidget::loadTile(int x, int y, int z)
   this->networkManager->get(request);
 }
 
-void QMapTileWidget::tileDownloaded()
-{
-  QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
-  if (!reply)
-    return;
-
-  QString key = reply->request().attribute(QNetworkRequest::User).toString();
-
-  if (reply->error() == QNetworkReply::NoError) {
-    QByteArray data = reply->readAll();
-    QPixmap pixmap;
-    pixmap.loadFromData(data);
-
-    MapTile *tile = this->tileCache.object(key);
-    if (tile) {
-      tile->pixmap = pixmap;
-      tile->loading = false;
-      this->update();
-    }
-  }
-
-  reply->deleteLater();
-}
 
 void QMapTileWidget::keyPressEvent(QKeyEvent *event)
 {
@@ -496,8 +549,8 @@ void QMapTileWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
   this->initGL();
 
   if (this->showMapEnabled) {
-    // Draw map tiles
-    painter->fillRect(this->rect(), Qt::lightGray);
+    // Fill background
+    painter->fillRect(this->rect(), QColor(229, 227, 223));
 
     QPointF centerPixel = latLonToTilePixel(this->mapCenter.x(), this->mapCenter.y(), this->mapLevel);
     double offsetX = this->size().width() / 2.0 - fmod(centerPixel.x(), 256.0);
