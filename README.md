@@ -94,6 +94,12 @@ From the build directory:
 - **Color Scales** - Multiple color schemes for data visualization
 - **Data Export** - Query and export trip subsets
 
+### 2.4 Known Limitations
+
+- **Animated Trip Paths (TripAnimation)** - Disabled on macOS due to geometry shader compatibility issues
+  - Alternative: Use TripLocation layer to visualize pickup/dropoff points
+- **File → Open Dialog** - Not yet implemented; change dataset in [querymanager.cpp](src/TaxiVis/querymanager.cpp#L10) and rebuild
+
 ## 3. Data Preprocessing
 
 TaxiVis requires taxi trip data in a specialized binary format (.kdtrip). The preprocessing pipeline converts raw CSV data into this indexed format for efficient querying.
@@ -101,13 +107,46 @@ TaxiVis requires taxi trip data in a specialized binary format (.kdtrip). The pr
 ### 3.1 Overview
 
 The preprocessing workflow:
-1. **CSV → Binary** - Convert CSV trip records to binary Trip format
-2. **Binary → KdTrip** - Build KD-tree spatial index for fast queries
-3. **(Optional)** - Sample or merge datasets
+1. **Merge** - Combine trip and fare CSV files
+2. **CSV → Binary** - Convert merged CSV to binary Trip format
+3. **Binary → KdTrip** - Build KD-tree spatial index for fast queries
 
-All preprocessing tools are built automatically in `build/src/preprocess/`.
+**Recommended:** Use the Julia-based pipeline for 10-15x faster processing (requires Julia 1.6+).
+All preprocessing tools are in `src/preprocess/` (Julia) and `build/src/preprocess/` (C++).
 
-### 3.2 Preprocessing Tools
+### 3.2 Quick Start (Julia Pipeline - Recommended)
+
+**Requirements:**
+- Julia 1.6+ installed
+- Raw NYC taxi CSV files (trip_data and trip_fare)
+
+**Automated Pipeline:**
+```bash
+# Process your data in one command
+./process_taxi_data.sh
+```
+
+The script automatically:
+1. Merges trip and fare data (multithreaded)
+2. Converts to binary format (multithreaded)
+3. Builds KD-tree spatial index
+4. Displays timing statistics
+
+**Performance:** Processes ~15 million trips (4GB CSV) in ~2-5 minutes on 16 cores.
+
+**Manual Julia Commands:**
+```bash
+# Step 1: Merge trip and fare CSVs
+julia -t 16 src/preprocess/merge.jl data/trip_data.csv data/trip_fare.csv data/merged.csv
+
+# Step 2: Convert to binary
+julia -t 16 src/preprocess/csv2Binary_mt.jl data/merged.csv data/merged.trip
+
+# Step 3: Build KD-tree index
+./build/src/preprocess/build_kdtrip data/merged.trip data/merged.kdtrip
+```
+
+### 3.3 C++ Preprocessing Tools (Legacy)
 
 #### csv2Binary
 Converts a single CSV file to binary Trip format.
@@ -211,25 +250,22 @@ Python script to merge separate trip and fare CSV files into the unified format.
 python src/preprocess/merge.py trips.csv fares.csv merged.csv
 ```
 
-### 3.3 Complete Preprocessing Pipeline
+### 3.4 Loading Data in TaxiVis
 
-**Step 1: Convert CSV to binary Trip format**
-```bash
-./build/src/preprocess/csv2Binary data/raw_trips.csv data/trips.trip
+**Option 1: Update default dataset** (edit [querymanager.cpp:10](src/TaxiVis/querymanager.cpp#L10)):
+```cpp
+std::string fname = string(DATA_DIR)+"your_data.kdtrip";
 ```
+Then rebuild TaxiVis.
 
-**Step 2: Build KD-tree index**
-```bash
-./build/src/preprocess/build_kdtrip data/trips.trip data/trips.kdtrip
-```
+**Option 2: File → Open** (not yet implemented in current version)
 
-**Step 3: Load in TaxiVis**
-```bash
-./build/src/TaxiVis/TaxiVis
-# File → Open → data/trips.kdtrip
-```
+The application will display:
+- Number of trips loaded
+- Time range of the dataset
+- Data statistics on startup
 
-### 3.4 Data Format Reference
+### 3.5 Data Format Reference
 
 **Binary Trip Structure (48 bytes):**
 - `uint32_t pickup_time` - Unix timestamp (seconds since epoch)
