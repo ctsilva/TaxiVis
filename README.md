@@ -4,8 +4,7 @@ A visual analytics application for exploring NYC taxi trip data using Qt5 and Op
 
 ## Current Status (Qt5 Migration)
 
-**✅ Working:** Temporal series plots, histograms, scatter plots, data loading, selection graphs
-**⚠️ Disabled:** Geographic map visualization (QtWebKit dependency - see [UPGRADE_PLAN.md](UPGRADE_PLAN.md))
+**✅ Complete:** Qt5 migration finished! All features working including OpenStreetMap tile-based geographic visualization.
 
 ## 1. Building from Source
 
@@ -84,17 +83,16 @@ From the build directory:
 
 ### 2.3 Available Features
 
-**Currently Working:**
+- **Geographic Map View** - OpenStreetMap tile-based visualization with pan/zoom
+  - Three-tier caching: memory → disk → network
+  - Persistent tile cache at `~/Library/Caches/TaxiVis/tiles` (macOS) or `~/.cache/TaxiVis/tiles` (Linux)
+  - Keyboard controls: Arrow keys to pan, +/- to zoom
 - **Temporal Series Plots** - Visualize trip metrics over time (fare, distance, duration, etc.)
 - **Histograms** - Distribution analysis of trip attributes
 - **Scatter Plots** - Correlation analysis between variables
 - **Selection Graphs** - Define spatial/temporal query regions
 - **Color Scales** - Multiple color schemes for data visualization
 - **Data Export** - Query and export trip subsets
-
-**Temporarily Unavailable:**
-- Geographic map view (requires QtWebEngine migration - see [UPGRADE_PLAN.md](UPGRADE_PLAN.md))
-- Histogram/Temporal dialogs (depend on map widget)
 
 ## 3. Data Preprocessing
 
@@ -257,6 +255,7 @@ See [CLAUDE.md](CLAUDE.md) for detailed architecture documentation.
 
 **Key Components:**
 - **KdTrip** - Spatial indexing and query engine
+- **QMapTileWidget** - Custom OpenStreetMap tile-based map widget with caching
 - **SelectionGraph** - Graph-based spatial selection system
 - **Rendering Layers** - OpenGL visualization (GridMap, HeatMap, TripAnimation, etc.)
 - **QCustomPlot** - Plotting library for temporal/statistical views
@@ -267,9 +266,8 @@ See [CLAUDE.md](CLAUDE.md) for detailed architecture documentation.
 - ✅ All Qt4 → Qt5 API migrations complete
 - ✅ OpenGL rendering updated (QGL → QOpenGL)
 - ✅ Boost filesystem compatibility fixed
-- ⚠️ Map components disabled pending QtWebEngine integration
-
-See [UPGRADE_PLAN.md](UPGRADE_PLAN.md) for roadmap to restore map functionality.
+- ✅ Map visualization restored with OpenStreetMap tile-based widget
+- ✅ QtWebKit dependency removed (replaced with QNetworkAccessManager)
 
 **Build with:**
 - Qt 5.15.17
