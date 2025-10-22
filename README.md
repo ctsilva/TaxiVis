@@ -12,7 +12,7 @@ A visual analytics application for exploring NYC taxi trip data using Qt5 and Op
 ### 1.1 Dependencies
 
 **Required:**
-- CMake 3.5 or higher
+- CMake 3.10 or higher
 - Qt 5 (5.15+ recommended)
 - Qt5 modules: Core, Gui, Widgets, OpenGL, Network, PrintSupport
 - OpenGL/GLEW 2.2+
@@ -30,20 +30,28 @@ sudo apt-get install cmake qt5-default libqt5opengl5-dev libglew-dev libboost-al
 
 ### 1.2 Compiling with CMake
 
+**Build everything (recommended):**
 ```bash
-cd src/TaxiVis
 mkdir build
 cd build
 
 # macOS - set Qt5 path
 export CMAKE_PREFIX_PATH="/opt/homebrew/opt/qt@5"
 
-# Configure and build
+# Configure and build both TaxiVis and preprocessing tools
 cmake ..
 make -j4
 ```
 
-The executable `TaxiVis` will be created in the build directory.
+This builds:
+- `src/TaxiVis/TaxiVis` - Main visualization application
+- `src/preprocess/csv2Binary` - CSV converter
+- `src/preprocess/build_kdtrip` - KD-tree indexer
+- `src/preprocess/multiCsv2Binary` - Batch CSV converter
+- `src/preprocess/newFormatCsv2Binary` - Alternative CSV converter
+- `src/preprocess/sampling` - Data sampling tool
+- `src/preprocess/testQuery` - Query testing utility
+- `src/preprocess/unif96_to_bin` - Legacy format converter
 
 ### 1.3 Build Troubleshooting
 
@@ -71,8 +79,7 @@ add_definitions(-DDATA_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/../../data/\")
 
 From the build directory:
 ```bash
-cd src/TaxiVis/build
-./TaxiVis
+./src/TaxiVis/TaxiVis
 ```
 
 ### 2.3 Available Features
@@ -91,21 +98,158 @@ cd src/TaxiVis/build
 
 ## 3. Data Preprocessing
 
-To index new taxi trip data, see the documentation in `doc/data_import.pdf`.
+TaxiVis requires taxi trip data in a specialized binary format (.kdtrip). The preprocessing pipeline converts raw CSV data into this indexed format for efficient querying.
 
-Preprocessing tools are in `src/preprocess/`:
-```bash
-cd src/preprocess
-mkdir build
-cd build
-cmake ..
-make
+### 3.1 Overview
+
+The preprocessing workflow:
+1. **CSV → Binary** - Convert CSV trip records to binary Trip format
+2. **Binary → KdTrip** - Build KD-tree spatial index for fast queries
+3. **(Optional)** - Sample or merge datasets
+
+All preprocessing tools are built automatically in `build/src/preprocess/`.
+
+### 3.2 Preprocessing Tools
+
+#### csv2Binary
+Converts a single CSV file to binary Trip format.
+
+**CSV Format Expected:**
+```
+pickup_time,dropoff_time,pickup_long,pickup_lat,dropoff_long,dropoff_lat,id_taxi,distance,fare_amount,surcharge,mta_tax,tip_amount,tolls_amount,payment_type,passengers,field1,field2,field3,field4
 ```
 
-Available tools:
-- `csv2Binary` - Convert CSV trip data to binary format
-- `build_kdtrip` - Build spatial index for efficient querying
-- `sampling` - Create subset samples of large datasets
+**Usage:**
+```bash
+./build/src/preprocess/csv2Binary input.csv output.trip
+```
+
+**Example:**
+```bash
+./build/src/preprocess/csv2Binary data/trips_2013-01.csv data/trips_2013-01.trip
+```
+
+#### multiCsv2Binary
+Processes multiple CSV files listed in an index file. Useful for batch processing large datasets split across files.
+
+**Usage:**
+```bash
+./build/src/preprocess/multiCsv2Binary file_list.txt output.trip
+```
+
+**file_list.txt format:**
+```
+/path/to/trips_2013-01-01.csv
+/path/to/trips_2013-01-02.csv
+/path/to/trips_2013-01-03.csv
+```
+
+#### newFormatCsv2Binary
+Converts NYC taxi data in the newer format (post-2015) where column order differs.
+
+**Usage:**
+```bash
+./build/src/preprocess/newFormatCsv2Binary input.csv output.trip
+```
+
+#### build_kdtrip
+Builds a KD-tree spatial index from binary Trip data. This is the final step - produces the `.kdtrip` file that TaxiVis loads.
+
+**Usage:**
+```bash
+./build/src/preprocess/build_kdtrip input.trip output.kdtrip
+```
+
+**Example:**
+```bash
+./build/src/preprocess/build_kdtrip data/trips_2013-01.trip data/trips_2013-01.kdtrip
+```
+
+**Output:** Creates a KD-tree index optimized for 7-dimensional queries:
+- pickup_time
+- dropoff_time
+- pickup_longitude
+- pickup_latitude
+- dropoff_longitude
+- dropoff_latitude
+- taxi_id
+
+#### sampling
+Creates a spatially-filtered sample from a .kdtrip file. Filters trips by census tract geometry and time range.
+
+**Usage:**
+```bash
+./build/src/preprocess/sampling input.kdtrip skip_factor output.csv
+```
+
+**Example (10% sample):**
+```bash
+./build/src/preprocess/sampling data/trips_2013.kdtrip 10 data/sample_10pct.csv
+```
+
+**Note:** Requires `data/census_tracts_geom.txt` geometry file.
+
+#### testQuery
+Tests KdTrip query functionality on a .kdtrip file. Useful for verifying index correctness.
+
+**Usage:**
+```bash
+./build/src/preprocess/testQuery input.kdtrip
+```
+
+#### unif96_to_bin
+Converts legacy 96-byte uniform binary format to the current Trip format. Only needed for old archived datasets.
+
+**Usage:**
+```bash
+./build/src/preprocess/unif96_to_bin input.bin output.trip
+```
+
+#### merge.py
+Python script to merge separate trip and fare CSV files into the unified format.
+
+**Usage:**
+```bash
+python src/preprocess/merge.py trips.csv fares.csv merged.csv
+```
+
+### 3.3 Complete Preprocessing Pipeline
+
+**Step 1: Convert CSV to binary Trip format**
+```bash
+./build/src/preprocess/csv2Binary data/raw_trips.csv data/trips.trip
+```
+
+**Step 2: Build KD-tree index**
+```bash
+./build/src/preprocess/build_kdtrip data/trips.trip data/trips.kdtrip
+```
+
+**Step 3: Load in TaxiVis**
+```bash
+./build/src/TaxiVis/TaxiVis
+# File → Open → data/trips.kdtrip
+```
+
+### 3.4 Data Format Reference
+
+**Binary Trip Structure (48 bytes):**
+- `uint32_t pickup_time` - Unix timestamp (seconds since epoch)
+- `uint32_t dropoff_time` - Unix timestamp
+- `float pickup_long` - Pickup longitude
+- `float pickup_lat` - Pickup latitude
+- `float dropoff_long` - Dropoff longitude
+- `float dropoff_lat` - Dropoff latitude
+- `uint16_t id_taxi` - Taxi/medallion ID
+- `uint16_t distance` - Distance in 0.01 miles (divide by 100)
+- `uint16_t fare_amount` - Fare in cents (divide by 100)
+- `uint16_t surcharge` - Surcharge in cents
+- `uint16_t mta_tax` - MTA tax in cents
+- `uint16_t tip_amount` - Tip in cents
+- `uint16_t tolls_amount` - Tolls in cents
+- `uint8_t payment_type` - Payment method code
+- `uint8_t passengers` - Number of passengers
+- `uint16_t field1, field2, field3, field4` - Custom/region fields
 
 ## 4. Architecture
 

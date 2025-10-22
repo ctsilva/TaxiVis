@@ -1,37 +1,46 @@
-cmake_minimum_required(VERSION 2.6)
-set(CMAKE_BUILD_TYPE Debug CACHE STRING "Set DataAccess build type.")
+cmake_minimum_required(VERSION 3.10)
 project(preprocess)
+
+# C++ standard
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_definitions(-D_FILE_OFSET_BITS=64)
 
-find_path(BOOST_ROOT boost)
-
+# Find Boost
 set(Boost_USE_STATIC_LIBS OFF)
-find_package(Boost 1.42 COMPONENTS system iostreams filesystem timer REQUIRED)
+find_package(Boost 1.42 COMPONENTS iostreams filesystem timer REQUIRED)
+
+# Find Qt5
+set(CMAKE_PREFIX_PATH "/opt/homebrew/opt/qt@5" CACHE PATH "Qt5 installation path")
+find_package(Qt5 COMPONENTS Core Gui Widgets REQUIRED)
 
 include_directories(${Boost_INCLUDE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_executable(unif96_to_bin unif96_to_bin.cpp) 
+# unif96_to_bin - converts old uniform 96-byte format to binary Trip format
+add_executable(unif96_to_bin unif96_to_bin.cpp)
+target_link_libraries(unif96_to_bin ${Boost_LIBRARIES})
 
-# Find Qt and related files
-find_package(Qt4 REQUIRED)
-include(${QT_USE_FILE})
-add_definitions(${QT_DEFINITIONS})
+# sampling - spatial sampling with census tract geometry
+add_executable(sampling sampling.cpp)
+target_link_libraries(sampling Qt5::Core Qt5::Gui Qt5::Widgets ${Boost_LIBRARIES})
 
-add_executable(sampling sampling.cpp) 
-target_link_libraries(sampling ${QT_LIBRARIES} ${Boost_LIBRARIES})
-
+# csv2Binary - converts single CSV file to binary Trip format
 add_executable(csv2Binary csv2Binary.cpp)
-target_link_libraries(csv2Binary ${QT_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(csv2Binary Qt5::Core ${Boost_LIBRARIES})
 
+# newFormatCsv2Binary - converts newer CSV format to binary Trip format
 add_executable(newFormatCsv2Binary newFormatCsv2Binary.cpp)
-target_link_libraries(newFormatCsv2Binary ${QT_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(newFormatCsv2Binary Qt5::Core ${Boost_LIBRARIES})
 
+# multiCsv2Binary - processes multiple CSV files listed in index file
 add_executable(multiCsv2Binary multiCsv2Binary.cpp)
-target_link_libraries(multiCsv2Binary ${QT_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(multiCsv2Binary Qt5::Core ${Boost_LIBRARIES})
 
+# testQuery - tests KdTrip query functionality
 add_executable(testQuery testQuery.cpp)
-target_link_libraries(testQuery ${QT_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(testQuery Qt5::Core ${Boost_LIBRARIES})
 
-add_executable(build_kdtrip build_kdtrip.cpp) 
-target_link_libraries(build_kdtrip ${Boost_LIBRARIES} ${QT_LIBRARIES} ${Boost_LIBRARIES})
+# build_kdtrip - builds KD-tree spatial index from binary Trip data
+add_executable(build_kdtrip build_kdtrip.cpp)
+target_link_libraries(build_kdtrip ${Boost_LIBRARIES})
