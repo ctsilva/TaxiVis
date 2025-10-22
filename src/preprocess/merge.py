@@ -14,7 +14,7 @@ def validMatch(tripTokens,fareTokens):
 numArgs = len(sys.argv)
 
 if numArgs != 4:
-    print "Usage: python merge.py <trips data> <fare data> <output file>"
+    print("Usage: python merge.py <trips data> <fare data> <output file>")
     exit(1)
 
 tripFileName = sys.argv[1]
@@ -33,9 +33,9 @@ outputFile.write('pickup_time,dropoff_time,pickup_long,pickup_lat,dropoff_long,d
 
 #
 count = 1
-for (tripLine,fareLine) in zip(tripsFile,fareFile):           
+for (tripLine,fareLine) in zip(tripsFile,fareFile):
     if count % 100000 == 0:
-        print 'Processed %d trips' % (count,)
+        print('Processed %d trips' % (count,))
     tripTokens = [t.strip() for t in tripLine.split(',')]
     fareTokens = [t.strip() for t in fareLine.split(',')]
     assert(validMatch(tripTokens,fareTokens))

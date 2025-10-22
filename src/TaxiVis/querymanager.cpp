@@ -7,8 +7,31 @@ using namespace std;
 
 QueryManager::QueryManager(){
     //create KDTrip
-    std::string fname = string(DATA_DIR)+"sample_merged_1.kdtrip";
+    std::string fname = string(DATA_DIR)+"2012_merged.kdtrip";
+    qDebug() << "Loading taxi trip data from:" << QString::fromStdString(fname);
     kdtrip = new KdTrip(fname);
+
+    // Count trips by iterating
+    int tripCount = 0;
+    uint32_t minTime = UINT32_MAX, maxTime = 0;
+    KdTrip::Iterator it = kdtrip->begin();
+    KdTrip::Iterator endIt = kdtrip->end();
+    while (it != endIt) {
+        tripCount++;
+        if (it->pickup_time < minTime) minTime = it->pickup_time;
+        if (it->dropoff_time > maxTime) maxTime = it->dropoff_time;
+        it++;
+    }
+
+    qDebug() << "Taxi trip data loaded successfully";
+    qDebug() << "  Number of trips:" << tripCount;
+
+    if (tripCount > 0) {
+        QDateTime minDate = QDateTime::fromTime_t(minTime);
+        QDateTime maxDate = QDateTime::fromTime_t(maxTime);
+        qDebug() << "  Time range:" << minDate.toString("yyyy-MM-dd HH:mm")
+                 << "to" << maxDate.toString("yyyy-MM-dd HH:mm");
+    }
 }
 
 QueryManager::~QueryManager(){

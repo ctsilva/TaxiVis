@@ -254,19 +254,9 @@ void TripAnimation::initGL()
   this->bufPath[0].generate();
   this->bufPath[1].generate();
 
-  const QOpenGLContext *context = QOpenGLContext::currentContext();
-  if (context) {
-    PQOpenGLShaderProgram sh = PQOpenGLShaderProgram(new QOpenGLShaderProgram());
-    this->shaders.push_back(sh);
-    sh->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/Resources/shaders/paths.120.vert");
-    sh->addShaderFromSourceFile(QOpenGLShader::Geometry, ":/Resources/shaders/paths.120.geom");
-    sh->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/Resources/shaders/paths.120.frag");
-    sh->bindAttributeLocation("pos", 0);
-    // Note: setGeometryInputType/OutputType removed in Qt5 - configure in shader instead
-    // sh->setGeometryInputType(GL_TRIANGLES);
-    // sh->setGeometryOutputType(GL_TRIANGLE_STRIP);
-    sh->link();
-  }
+  // Geometry shaders are not supported on macOS in compatibility profile
+  // TripAnimation (animated paths) is disabled on this platform
+  // Users can still use TripLocation layer to visualize pickup/dropoff points
 
   this->toolBar = this->geoWidget->scene()->addWidget(this->toolBarWidget);
   this->toolBar->setVisible(this->enabled);

@@ -1,11 +1,12 @@
-#version 150 core
+#version 120
+#extension GL_EXT_gpu_shader4 : enable
 
 uniform int  nVert;
 uniform int  zoom;
 uniform vec2 center;
 uniform vec2 scale;
 
-in vec4 pos;
+attribute vec4 pos;
 
 void main(void)
 {

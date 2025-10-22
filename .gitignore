@@ -1,1 +1,6 @@
 build/
+
+# Large data files
+data/*.csv
+data/*.trip
+data/*.kdtrip

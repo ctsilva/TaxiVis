@@ -352,7 +352,6 @@ bool QMapTileWidget::loadTileFromDisk(int x, int y, int z)
   newTile->loading = false;
   this->tileCache.insert(key, newTile, 1);
 
-  qDebug() << "Loaded tile from disk:" << filePath;
   return true;
 }
 
