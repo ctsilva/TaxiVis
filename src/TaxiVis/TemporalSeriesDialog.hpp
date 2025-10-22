@@ -1,7 +1,7 @@
 #ifndef TEMPORAL_SERIES_DIALOG_H
 #define TEMPORAL_SERIES_DIALOG_H
 
-#include <QtGui/QDialog>
+#include <QDialog>
 #include "extendedplotwidget.h"
 
 namespace Ui {

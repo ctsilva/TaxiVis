@@ -4,10 +4,10 @@
 #include "KdTrip.hpp"
 #include <set>
 #include <vector>
-#include <QtCore/QList>
-#include <QtGui/QPolygonF>
-#include <QtGui/QVector2D>
-#include <QtOpenGL/QGLFramebufferObject>
+#include <QList>
+#include <QPolygonF>
+#include <QVector2D>
+#include <QOpenGLFramebufferObject>
 
 class ColorScale;
 class GeographicalViewWidget;
@@ -73,8 +73,8 @@ protected:
   std::vector<int>        indices;
   std::vector<float>      triangles;
 
-  PQGLShaderProgram       shader;
-  PQGLFramebufferObject   fbo;
+  PQOpenGLShaderProgram       shader;
+  PQOpenGLFramebufferObject   fbo;
 
   QFont                   labelFont;
   QFontMetrics            labelMetrics;

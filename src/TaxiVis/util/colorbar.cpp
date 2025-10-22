@@ -2,6 +2,7 @@
 #include "util/colorscale.h"
 
 #include <QtGui>
+#include <QApplication>
 #include <iostream>
 
 ColorBar::ColorBar(ColorScale *colorScale):

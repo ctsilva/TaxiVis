@@ -187,7 +187,8 @@ public:
     
   void loadFromFile(const char *filename)
   {
-    std::string ext = boost::filesystem::extension(filename);
+    boost::filesystem::path p(filename);
+    std::string ext = p.extension().string();
     if (ext==".txt")
       this->loadFromText(filename);
     else if (ext==".osrm")

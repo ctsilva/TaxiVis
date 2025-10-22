@@ -5,10 +5,10 @@
 #include "geographicalviewwidget.h"
 #include "temporalseriesplotwidget.h"
 #include "util/colorbar.h"
-#include <QtGui/QVector2D>
-#include <QtGui/QCursor>
-#include <QtGui/QGraphicsItem>
-#include <QtOpenGL/QGLShaderProgram>
+#include <QVector2D>
+#include <QCursor>
+#include <QGraphicsItem>
+#include <QOpenGLShaderProgram>
 
 struct Grid {
   size_t size() {
@@ -229,10 +229,10 @@ void GridMap::initGL()
   this->buffer[2].generate();
   const QGLContext *context = QGLContext::currentContext();
   if (context) {
-    this->shader = PQGLShaderProgram(new QGLShaderProgram(context));
+    this->shader = PQOpenGLShaderProgram(new QOpenGLShaderProgram(context));
     this->shader->addShaderFromSourceFile(QGLShader::Vertex, ":/Resources/shaders/geo2screen.120.vert");
     this->shader->link();
-    this->fbo = PQGLFramebufferObject(new QGLFramebufferObject(1024, 1024));
+    this->fbo = PQOpenGLFramebufferObject(new QOpenGLFramebufferObject(1024, 1024));
   }
 }
 

@@ -1,8 +1,10 @@
 #include "coordinator.h"
+#ifndef NO_WEBKIT
 #include "viewwidget.h"
-#include "temporalseriesplotwidget.h"
 #include "QMapWidget.hpp"
 #include "geographicalviewwidget.h"
+#endif
+#include "temporalseriesplotwidget.h"
 #include "util/colorbar.h"
 #include "histogramwidget.h"
 
@@ -19,22 +21,31 @@ Coordinator::Coordinator(QObject *parent) :
 
 void Coordinator::addView(ViewWidget *view)
 {
+#ifndef NO_WEBKIT
     _linkedViews.insert(view);
     _linkedPlots.insert(view->timeSeriesWidget());
     _linkedHists.insert(view->histogramWidget());
     this->addMapWidget((GeographicalViewWidget*)view->mapWidget());
     setSeriesAttribute(view->timeSeriesWidget()->plotAttribute());
     setHistsAttribute(view->histogramWidget()->plotAttribute());
+#else
+    Q_UNUSED(view);
+#endif
 }
 
 void Coordinator::addMapWidget(GeographicalViewWidget *widget)
 {
+#ifndef NO_WEBKIT
     _linkedMapViews.insert(widget->mapView());
     _linkedMapWidgets.insert(widget);
+#else
+    Q_UNUSED(widget);
+#endif
 }
 
 void Coordinator::removeView(ViewWidget *view)
 {
+#ifndef NO_WEBKIT
     _linkedViews.remove(view);
     _linkedPlots.remove(view->timeSeriesWidget());
     _linkedHists.remove(view->histogramWidget());
@@ -43,6 +54,9 @@ void Coordinator::removeView(ViewWidget *view)
 
     view->timeSeriesWidget()->recomputePlots();
     view->histogramWidget()->recomputePlots();
+#else
+    Q_UNUSED(view);
+#endif
 }
 
 bool Coordinator::containsView(ViewWidget *view)
@@ -57,7 +71,12 @@ bool Coordinator::containsTimeSeries(TemporalSeriesPlotWidget *plot)
 
 bool Coordinator::containsMapView(QMapView *mw)
 {
+#ifndef NO_WEBKIT
   return this->enabled && _linkedMapViews.contains(mw);
+#else
+  Q_UNUSED(mw);
+  return false;
+#endif
 }
 
 bool Coordinator::containsHist(HistogramWidget *plot)
@@ -87,6 +106,7 @@ void Coordinator::notifyAll()
     }
 
     // compute scalar max and min
+#ifndef NO_WEBKIT
     QVector2D range(1000000000., -1000000000.);
     foreach (ViewWidget *view,  _linkedViews) {
       GeographicalViewWidget *gw = (GeographicalViewWidget*)view->mapWidget();
@@ -99,6 +119,7 @@ void Coordinator::notifyAll()
       gw->getColorBar()->setRealMinMax(range.x(), range.y());
       gw->repaintContents();
     }
+#endif
 
     // HISTOGRAMS
     foreach (HistogramWidget *plot,  _linkedHists) {

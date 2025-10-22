@@ -1,12 +1,12 @@
 #ifndef TRIP_ANIMATION_HPP
 #define TRIP_ANIMATION_HPP
 #include "RenderingLayer.hpp"
-#include <QtGui/QFont>
-#include <QtGui/QVector2D>
+#include <QFont>
+#include <QVector2D>
 #include <vector>
 
 class GeographicalViewWidget;
-class QGLShaderProgram;
+class QOpenGLShaderProgram;
 class QGraphicsProxyWidget;
 class QProgressDialog;
 namespace Ui
@@ -67,7 +67,7 @@ protected:
   void setFrameCount(int cnt);
 
 private:
-  typedef QSharedPointer<QGLShaderProgram> PQGLShaderProgram;
+  typedef QSharedPointer<QOpenGLShaderProgram> PQOpenGLShaderProgram;
   
   Ui::TripAnimationConfig  *uiConfig;
   Ui::TripAnimationToolBar *uiToolBar;
@@ -87,7 +87,7 @@ private:
   std::vector<float>             pathVertices;
   std::vector<int>               pathIndices;
   std::vector<float>             pathWeights;
-  std::vector<PQGLShaderProgram> shaders;
+  std::vector<PQOpenGLShaderProgram> shaders;
 
   QFont                   font;
   GeographicalViewWidget *geoWidget;

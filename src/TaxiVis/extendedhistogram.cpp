@@ -186,15 +186,15 @@ void ExtendedHistogram::clearSelections(){
 
 void ExtendedHistogram::mousePressEvent(QMouseEvent *event){
     //qDebug() << "Click";
-    basePoint    = event->posF();
+    basePoint    = event->pos();
     lastPoint    = basePoint;
     currentPoint = basePoint;
 
     //pickSelection
     int index = -1;
     bool pickedSelection = false;
-    //qDebug() << "Pick Selection " << event->posF();
-    pickSelection(event->posF(),pickedSelection,index);
+    //qDebug() << "Pick Selection " << event->pos();
+    pickSelection(event->pos(),pickedSelection,index);
 
     if(pickedSelection){
         if(event->modifiers() & Qt::CTRL){
@@ -233,7 +233,7 @@ void ExtendedHistogram::mousePressEvent(QMouseEvent *event){
 }
 
 void ExtendedHistogram::mouseMoveEvent(QMouseEvent *event){
-    currentPoint = event->posF();
+    currentPoint = event->pos();
     double lastCoord = xAxis->pixelToCoord(lastPoint.x());
     double currentCoord = xAxis->pixelToCoord(currentPoint.x());
     double delta = currentCoord - lastCoord;

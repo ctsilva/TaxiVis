@@ -4,10 +4,10 @@
 #include "KdTrip.hpp"
 #include <set>
 #include <vector>
-#include <QtCore/QList>
-#include <QtGui/QImage>
-#include <QtGui/QVector2D>
-#include <QtOpenGL/QGLFramebufferObject>
+#include <QList>
+#include <QImage>
+#include <QVector2D>
+#include <QOpenGLFramebufferObject>
 
 class ColorBar;
 class ColorScale;
@@ -74,7 +74,7 @@ protected:
   bool                    visualDirty;
   bool                    colorBarVisible;
 
-  PQGLFramebufferObject   fbo;
+  PQOpenGLFramebufferObject   fbo;
 
   QFont                   labelFont;
   QFontMetrics            labelMetrics;

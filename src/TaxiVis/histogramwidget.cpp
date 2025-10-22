@@ -570,16 +570,16 @@ void HistogramWidget::updateYRange(float min, float max)
 }
 
 void HistogramWidget::changeHistAttribute(QString selectedText){
-    if(!selectedText.compare(QString::fromAscii("Fare Amount"))){
+    if(!selectedText.compare(QString::fromLatin1("Fare Amount"))){
         _plotAttribute = HistogramWidget::FARE_AMOUNT;
     }
-    else if(!selectedText.compare(QString::fromAscii("Tip"))){
+    else if(!selectedText.compare(QString::fromLatin1("Tip"))){
         _plotAttribute = HistogramWidget::TIP_AMOUNT;
     }
-    else if(!selectedText.compare(QString::fromAscii("Distance"))){
+    else if(!selectedText.compare(QString::fromLatin1("Distance"))){
         _plotAttribute = HistogramWidget::DISTANCE;
     }
-    else if(!selectedText.compare(QString::fromAscii("Duration"))){
+    else if(!selectedText.compare(QString::fromLatin1("Duration"))){
         _plotAttribute = HistogramWidget::DURATION;
     }
     else{

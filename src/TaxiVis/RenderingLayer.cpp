@@ -1,5 +1,5 @@
 #include "RenderingLayer.hpp"
-#include <QtGui/QPainter>
+#include <QPainter>
 
 RenderingLayer::RenderingLayer(bool _enabled)
     : enabled(_enabled)

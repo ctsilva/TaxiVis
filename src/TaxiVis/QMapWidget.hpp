@@ -2,11 +2,13 @@
 #define Q_MAP_WIDGET_HPP
 
 #include <GL/glew.h>
-#include <QtGui/QGraphicsView>
-#include <QtGui/QSlider>
-#include <QtGui/QGraphicsProxyWidget>
-#include <QtOpenGL/QGLWidget>
-#include <QtWebKit/QGraphicsWebView>
+#include <QGraphicsView>
+#include <QSlider>
+#include <QGraphicsProxyWidget>
+#include <QOpenGLWidget>
+#ifndef NO_WEBKIT
+#include <QtWebKitWidgets/QGraphicsWebView>
+#endif
 #include <vector>
 
 class QMapView;

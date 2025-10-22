@@ -2,8 +2,8 @@
 #include "QMapView.hpp"
 #include "geographicalviewwidget.h"
 #include "global.h"
-#include <QtGui/QVector2D>
-#include <QtOpenGL/QGLShaderProgram>
+#include <QVector2D>
+#include <QOpenGLShaderProgram>
 
 TripLocation::TripLocation(GeographicalViewWidget *gw) :
     dataReady(false),
@@ -68,7 +68,7 @@ void TripLocation::initGL()
   this->glBuffer.generate();
   const QGLContext *context = QGLContext::currentContext();
   if (context) {
-    this->shader = PQGLShaderProgram(new QGLShaderProgram(context));
+    this->shader = PQOpenGLShaderProgram(new QOpenGLShaderProgram(context));
     this->shader->addShaderFromSourceFile(QGLShader::Vertex, ":/Resources/shaders/location.120.vert");
     this->shader->link();
   }

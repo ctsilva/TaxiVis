@@ -2,8 +2,8 @@
 #include "QMapView.hpp"
 #include "geographicalviewwidget.h"
 #include "global.h"
-#include <QtGui/QVector2D>
-#include <QtOpenGL/QGLShaderProgram>
+#include <QVector2D>
+#include <QOpenGLShaderProgram>
 #include <queue>
 
 TripLocationLOD::TripLocationLOD(GeographicalViewWidget *gw)

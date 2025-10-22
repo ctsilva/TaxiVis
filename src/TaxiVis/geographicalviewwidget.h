@@ -1,7 +1,9 @@
 #ifndef GEOGRAPHICALVIEWWIDGET_H
 #define GEOGRAPHICALVIEWWIDGET_H
 
+#ifndef NO_WEBKIT
 #include "QMapWidget.hpp"
+#endif
 #include "KdTrip.hpp"
 #include "RenderingLayer.hpp"
 #include "SelectionGraph.h"
@@ -11,6 +13,7 @@
 #include <QHash>
 #include <QVector>
 #include <QStringList>
+#include <QWidget>
 
 class GridMap;
 class HeatMap;
@@ -19,7 +22,11 @@ class TripLocation;
 class ColorBar;
 class Coordinator;
 
+#ifdef NO_WEBKIT
+class GeographicalViewWidget : public QWidget
+#else
 class GeographicalViewWidget : public QMapWidget
+#endif
 {
     Q_OBJECT
 public:

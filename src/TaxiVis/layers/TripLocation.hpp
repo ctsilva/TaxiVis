@@ -32,7 +32,7 @@ protected:
   bool                    bufferDirty;
   GLBuffer                glBuffer;
   std::vector<float>      vertices;
-  PQGLShaderProgram       shader;
+  PQOpenGLShaderProgram       shader;
   QColor                  colorPickup;
   QColor                  colorDropoff;
   GeographicalViewWidget *geoWidget;

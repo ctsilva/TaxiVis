@@ -343,46 +343,46 @@ void TemporalSeriesPlotWidget::updatePlotAttrib(QString selectedText){
 
 //    qDebug() << "   Update Plot Attrib " << selectedText;
 
-    if(!selectedText.compare(QString::fromAscii("Num Trips"))){
+    if(!selectedText.compare(QString::fromLatin1("Num Trips"))){
         _plotAttribute = TemporalSeriesPlotWidget::NUMBER_OF_TRIPS;
     }
-    else if(!selectedText.compare(QString::fromAscii("Fare Amount"))){
+    else if(!selectedText.compare(QString::fromLatin1("Fare Amount"))){
         _plotAttribute = TemporalSeriesPlotWidget::FARE_AMOUNT;
     }
-    else if(!selectedText.compare(QString::fromAscii("Tip"))){
+    else if(!selectedText.compare(QString::fromLatin1("Tip"))){
         _plotAttribute = TemporalSeriesPlotWidget::TIP_AMOUNT;
     }
-    else if(!selectedText.compare(QString::fromAscii("Total Revenue"))){
+    else if(!selectedText.compare(QString::fromLatin1("Total Revenue"))){
         _plotAttribute = TemporalSeriesPlotWidget::TOTAL_AMOUNT;
     }
-    else if(!selectedText.compare(QString::fromAscii("Fare per Trip"))){
+    else if(!selectedText.compare(QString::fromLatin1("Fare per Trip"))){
         _plotAttribute = TemporalSeriesPlotWidget::FARE_PER_TRIP;
     }
-    else if(!selectedText.compare(QString::fromAscii("Fare per Mile"))){
+    else if(!selectedText.compare(QString::fromLatin1("Fare per Mile"))){
         _plotAttribute = TemporalSeriesPlotWidget::FARE_PER_MILE;
     }
-    else if(!selectedText.compare(QString::fromAscii("Tips per Trip"))){
+    else if(!selectedText.compare(QString::fromLatin1("Tips per Trip"))){
         _plotAttribute = TemporalSeriesPlotWidget::TIP_PER_TRIP;
     }
-    else if(!selectedText.compare(QString::fromAscii("Tips per Mile"))){
+    else if(!selectedText.compare(QString::fromLatin1("Tips per Mile"))){
         _plotAttribute = TemporalSeriesPlotWidget::TIP_PER_MILE;
     }
-    else if(!selectedText.compare(QString::fromAscii("Active Cabs"))){
+    else if(!selectedText.compare(QString::fromLatin1("Active Cabs"))){
         _plotAttribute = TemporalSeriesPlotWidget::NUM_TAXIS;
     }
-    else if(!selectedText.compare(QString::fromAscii("Tolls Amount"))){
+    else if(!selectedText.compare(QString::fromLatin1("Tolls Amount"))){
         _plotAttribute = TemporalSeriesPlotWidget::TOLL_AMOUNT;
     }
-    else if(!selectedText.compare(QString::fromAscii("Tolls Per Trip"))){
+    else if(!selectedText.compare(QString::fromLatin1("Tolls Per Trip"))){
         _plotAttribute = TemporalSeriesPlotWidget::TOLL_PER_TRIP;
     }
-    else if(!selectedText.compare(QString::fromAscii("Average Speed"))){
+    else if(!selectedText.compare(QString::fromLatin1("Average Speed"))){
         _plotAttribute = TemporalSeriesPlotWidget::AVG_SPEED_PER_TRIP;
     }
-    else if(!selectedText.compare(QString::fromAscii("Distance"))){
+    else if(!selectedText.compare(QString::fromLatin1("Distance"))){
         _plotAttribute = TemporalSeriesPlotWidget::DISTANCE_PER_TRIP;
     }
-    else if(!selectedText.compare(QString::fromAscii("Duration"))){
+    else if(!selectedText.compare(QString::fromLatin1("Duration"))){
         _plotAttribute = TemporalSeriesPlotWidget::DURATION_PER_TRIP;
     }
     else{

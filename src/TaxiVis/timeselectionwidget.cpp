@@ -3,7 +3,7 @@
 #include <QMessageBox>
 #include <iostream>
 #include <QDebug>
-#include <QtGui/QInputDialog>
+#include <QInputDialog>
 #include <cassert>
 
 using namespace std;
@@ -38,19 +38,19 @@ int TimeSelectionWidget::getStepSize(){
     int stepSizeInMinutes = -1;
     QString selectedText = ui->comboBox_2->currentText();
 
-    if(!selectedText.compare(QString::fromAscii("15 min"))){
+    if(!selectedText.compare(QString::fromLatin1("15 min"))){
         stepSizeInMinutes = 15;
     }
-    else if(!selectedText.compare(QString::fromAscii("30 min"))){
+    else if(!selectedText.compare(QString::fromLatin1("30 min"))){
         stepSizeInMinutes = 30;
     }
-    else if(!selectedText.compare(QString::fromAscii("1 hour"))){
+    else if(!selectedText.compare(QString::fromLatin1("1 hour"))){
         stepSizeInMinutes = 60;
     }
-    else if(!selectedText.compare(QString::fromAscii("1 day"))){
+    else if(!selectedText.compare(QString::fromLatin1("1 day"))){
         stepSizeInMinutes = 24*60;
     }
-    else if(!selectedText.compare(QString::fromAscii("1 week"))){
+    else if(!selectedText.compare(QString::fromLatin1("1 week"))){
         stepSizeInMinutes = 24*60*7;
     }
 
@@ -101,7 +101,7 @@ void TimeSelectionWidget::stepForward(){
 void TimeSelectionWidget::timeDialogsChanged(){
   if (this->ui->tabWidget->currentWidget()==this->ui->regularTimeWidget) {
     if(ui->startTime->dateTime() > ui->endTime->dateTime()){
-        QMessageBox::critical(this, QString::fromAscii("Error"),QString::fromAscii("Start time should be smaller than End Time!"));
+        QMessageBox::critical(this, QString::fromLatin1("Error"),QString::fromLatin1("Start time should be smaller than End Time!"));
     }
     else{
         //qDebug() << "timeDialogsChanged " << getStartTime() << "; " << getEndTime();

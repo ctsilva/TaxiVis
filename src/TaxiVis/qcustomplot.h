@@ -41,6 +41,7 @@
 #include <QDebug>
 #include <QVector2D>
 #include <QStack>
+#include <QPainterPath>
 #include <qmath.h>
 #include <limits>
 

@@ -76,7 +76,7 @@ void ExtendedPlotWidget::paintEvent(QPaintEvent *event){
 void ExtendedPlotWidget::mousePressEvent(QMouseEvent *event){
     if(event->button() & Qt::RightButton){
         //draw selection
-        lastPoint    = event->posF();
+        lastPoint    = event->pos();
         currentPoint = lastPoint;
         currentState = SELECTION;
         repaint();
@@ -89,9 +89,9 @@ void ExtendedPlotWidget::mousePressEvent(QMouseEvent *event){
 
 void ExtendedPlotWidget::mouseMoveEvent(QMouseEvent *event){
     //
-    mousePosition = event->posF();
+    mousePosition = event->pos();
     if(currentState == SELECTION){
-        currentPoint = event->posF();
+        currentPoint = event->pos();
         repaint();
     }
     else if(buttonPressed){

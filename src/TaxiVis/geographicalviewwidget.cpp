@@ -19,7 +19,7 @@
 #include <QDebug>
 #include <QEventLoop>
 #include <QGraphicsSceneMouseEvent>
-#include <QtGui/QProgressDialog>
+#include <QProgressDialog>
 
 #include "CityMap.hpp"
 

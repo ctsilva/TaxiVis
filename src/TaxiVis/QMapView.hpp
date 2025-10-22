@@ -1,11 +1,11 @@
 #ifndef Q_MAP_VIEW_HPP
 #define Q_MAP_VIEW_HPP
 
-#include <QtCore/QPointF>
-#include <QtCore/QTime>
-#include <QtGui/QGraphicsSceneMouseEvent>
-#include <QtWebKit/QGraphicsWebView>
-#include <QtWebKit/QWebView>
+#include <QPointF>
+#include <QTime>
+#include <QGraphicsSceneMouseEvent>
+#include <QtWebKitWidgets/QGraphicsWebView>
+#include <QtWebKitWidgets/QWebView>
 #include "RenderingLayer.hpp"
 
 class QMapWidget;

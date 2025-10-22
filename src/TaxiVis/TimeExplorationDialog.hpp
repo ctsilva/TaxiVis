@@ -1,7 +1,7 @@
 #ifndef TIME_EXPLORATION_DIALOG_H
 #define TIME_EXPLORATION_DIALOG_H
 
-#include <QtGui/QDialog>
+#include <QDialog>
 #include "geographicalviewwidget.h"
 
 namespace Ui {

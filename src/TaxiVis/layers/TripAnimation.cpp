@@ -6,15 +6,15 @@
 #include "geographicalviewwidget.h"
 #include "global.h"
 #include <math.h>
-#include <QtCore/QTimer>
-#include <QtGui/QAction>
-#include <QtGui/QApplication>
-#include <QtGui/QLabel>
-#include <QtGui/QLayout>
-#include <QtGui/QProgressDialog>
-#include <QtGui/QToolBar>
-#include <QtGui/QToolButton>
-#include <QtOpenGL/QGLShaderProgram>
+#include <QTimer>
+#include <QAction>
+#include <QApplication>
+#include <QLabel>
+#include <QLayout>
+#include <QProgressDialog>
+#include <QToolBar>
+#include <QToolButton>
+#include <QOpenGLShaderProgram>
 
 TripAnimation::TripAnimation(GeographicalViewWidget *gw) :
     RenderingLayer(false),
@@ -250,7 +250,7 @@ void TripAnimation::initGL()
 
   const QGLContext *context = QGLContext::currentContext();
   if (context) {
-    PQGLShaderProgram sh = PQGLShaderProgram(new QGLShaderProgram(context));
+    PQOpenGLShaderProgram sh = PQOpenGLShaderProgram(new QOpenGLShaderProgram(context));
     this->shaders.push_back(sh);
     sh->addShaderFromSourceFile(QGLShader::Vertex, ":/Resources/shaders/paths.120.vert");
     sh->addShaderFromSourceFile(QGLShader::Geometry, ":/Resources/shaders/paths.120.geom");
@@ -295,7 +295,7 @@ void TripAnimation::renderPaths()
   QPointF center = this->geoWidget->mapView()->center();
   int zoomLevel = this->geoWidget->mapView()->zoomLevel();
   QSizeF size = this->geoWidget->mapView()->size();
-  PQGLShaderProgram sh = this->shaders[0];
+  PQOpenGLShaderProgram sh = this->shaders[0];
   sh->bind();
   sh->setUniformValue("nVert", this->pathGeomVertexCount);
   sh->setUniformValue("zoom", zoomLevel);

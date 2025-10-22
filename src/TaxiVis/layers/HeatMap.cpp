@@ -4,7 +4,7 @@
 #include "geographicalviewwidget.h"
 #include "util/colorbar.h"
 #include "util/heatedobjectscale.h"
-#include <QtGui/QVector2D>
+#include <QVector2D>
 
 HeatMap::HeatMap(GeographicalViewWidget *gw) :
     RenderingLayer(false),
@@ -218,7 +218,7 @@ void HeatMap::computeVisualData()
   
 void HeatMap::initGL()
 {
-  this->fbo = PQGLFramebufferObject(new QGLFramebufferObject(2048, 2048));
+  this->fbo = PQOpenGLFramebufferObject(new QOpenGLFramebufferObject(2048, 2048));
   this->initialized = true;
   if (this->enabled && this->visualDirty)
     this->computeVisualData();

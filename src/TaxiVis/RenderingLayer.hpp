@@ -1,16 +1,16 @@
 #ifndef RENDERING_LAYER_HPP
 #define RENDERING_LAYER_HPP
 #include <GL/glew.h>
-#include <qgl.h>
-#include <QtCore/QSharedPointer>
-#include <QtGui/QImage>
+#include <QOpenGLWidget>
+#include <QOpenGLShaderProgram>
+#include <QOpenGLFramebufferObject>
+#include <QSharedPointer>
+#include <QImage>
 
 class QPainter;
-class QGLShaderProgram;
-class QGLFramebufferObject;
 class RenderingLayer;
-typedef QSharedPointer<QGLShaderProgram>     PQGLShaderProgram;
-typedef QSharedPointer<QGLFramebufferObject> PQGLFramebufferObject;
+typedef QSharedPointer<QOpenGLShaderProgram>     PQOpenGLShaderProgram;
+typedef QSharedPointer<QOpenGLFramebufferObject> PQOpenGLFramebufferObject;
 
 class RenderingLayer
 {
@@ -94,13 +94,13 @@ struct GLTexture
 
   void setImage(const QImage &img)
   {
-    QImage texImg = QGLWidget::convertToGLFormat(img);
+    QImage texImg = img.convertToFormat(QImage::Format_RGBA8888).mirrored();
     this->bind();
     this->ensureSize(texImg.size());
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0,
                     texImg.width(), texImg.height(),
-                    GL_RGBA, GL_UNSIGNED_BYTE, texImg.bits());
-    
+                    GL_RGBA, GL_UNSIGNED_BYTE, texImg.constBits());
+
   }
 
   GLuint id;

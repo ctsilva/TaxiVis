@@ -1,11 +1,11 @@
 #include "QMapView.hpp"
 #include "QMapWidget.hpp"
-#include <QtCore/QMultiMap>
-#include <QtCore/QTimer>
-#include <QtGui/QGesture>
-#include <QtGui/QMouseEvent>
-#include <QtGui/QStyleOptionGraphicsItem>
-#include <QtWebKit/QWebFrame>
+#include <QMultiMap>
+#include <QTimer>
+#include <QGesture>
+#include <QMouseEvent>
+#include <QStyleOptionGraphicsItem>
+#include <QtWebKitWidgets/QWebFrame>
 #include <cmath>
 
 class RenderingLayerManager

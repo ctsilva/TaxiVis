@@ -1,7 +1,7 @@
 #ifndef HISTOGRAM_DIALOG_H
 #define HISTOGRAM_DIALOG_H
 
-#include <QtGui/QDialog>
+#include <QDialog>
 #include "extendedhistogram.h"
 #include "geographicalviewwidget.h"
 
