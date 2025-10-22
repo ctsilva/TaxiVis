@@ -74,7 +74,7 @@ protected:
   bool sceneEvent(QEvent *event);
 
 private:
-  void loadTile(int x, int y, int z);
+  bool loadTile(int x, int y, int z);
   void loadVisibleTiles();
   QPointF latLonToTilePixel(double lat, double lon, int zoom) const;
   QString getTileCachePath() const;
@@ -88,6 +88,8 @@ private:
   QPoint       lastPos;
   QPointF      mapCenter;  // lat, lon
   int          mapLevel;
+  QPointF      initialCenter;  // Initial center for reset
+  int          initialLevel;   // Initial zoom level for reset
   QPointF      lastCenter;
   int          lastLevel;
   int          startedPinchZoomLevel;

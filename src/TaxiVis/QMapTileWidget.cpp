@@ -158,6 +158,7 @@ QMapTileWidget::QMapTileWidget(QPointF coords, int level, QWidget *parent)
     : QGraphicsWidget(), glInitialized(false),
       showMapEnabled(true), lastButtonPressed(-1),
       mapCenter(coords), mapLevel(level),
+      initialCenter(coords), initialLevel(level),
       lastCenter(coords), lastLevel(level),
       mapWidget(static_cast<QMapWidget*>(parent)),
       fpsRenderingLayer(new FpsRenderingLayer()),
@@ -165,6 +166,10 @@ QMapTileWidget::QMapTileWidget(QPointF coords, int level, QWidget *parent)
 {
   this->setAcceptTouchEvents(true);
   this->grabGesture(Qt::PinchGesture);
+
+  // Set cache size to hold ~1000 tiles (each tile costs 1)
+  // This prevents tiles from being evicted during normal panning
+  this->tileCache.setMaxCost(1000);
 
   // Use OpenStreetMap tile server
   // Note: For production, consider using a different tile server or self-hosting
@@ -180,6 +185,19 @@ QMapTileWidget::QMapTileWidget(QPointF coords, int level, QWidget *parent)
       QByteArray data = reply->readAll();
       QPixmap pixmap;
       pixmap.loadFromData(data);
+
+      // Convert to grayscale for better data visualization
+      if (!pixmap.isNull()) {
+        QImage img = pixmap.toImage().convertToFormat(QImage::Format_ARGB32);
+        for (int y = 0; y < img.height(); y++) {
+          for (int x = 0; x < img.width(); x++) {
+            QRgb pixel = img.pixel(x, y);
+            int gray = qGray(pixel);
+            img.setPixel(x, y, qRgba(gray, gray, gray, qAlpha(pixel)));
+          }
+        }
+        pixmap = QPixmap::fromImage(img);
+      }
 
       MapTile *tile = this->tileCache.object(key);
       if (tile && !pixmap.isNull()) {
@@ -310,6 +328,8 @@ void QMapTileWidget::loadVisibleTiles()
 
   int maxTile = (1 << this->mapLevel) - 1;
 
+  bool anyTilesLoaded = false;
+
   // Load tiles in a grid around the center
   for (int dy = -tilesY; dy <= tilesY; dy++) {
     for (int dx = -tilesX; dx <= tilesX; dx++) {
@@ -324,9 +344,14 @@ void QMapTileWidget::loadVisibleTiles()
       if (ty < 0 || ty > maxTile)
         continue;
 
-      loadTile(tx, ty, this->mapLevel);
+      if (loadTile(tx, ty, this->mapLevel))
+        anyTilesLoaded = true;
     }
   }
+
+  // Only trigger update if we actually loaded tiles
+  if (anyTilesLoaded)
+    this->update();
 }
 
 QString QMapTileWidget::getTileCacheFilePath(int x, int y, int z) const
@@ -364,19 +389,18 @@ void QMapTileWidget::saveTileToDisk(int x, int y, int z, const QPixmap &pixmap)
   pixmap.save(filePath, "PNG");
 }
 
-void QMapTileWidget::loadTile(int x, int y, int z)
+bool QMapTileWidget::loadTile(int x, int y, int z)
 {
   MapTile tile(x, y, z);
   QString key = tile.key();
 
   // Check if tile is already in memory cache
   if (this->tileCache.contains(key))
-    return;
+    return false;
 
   // Try to load from disk cache first
   if (loadTileFromDisk(x, y, z)) {
-    this->update();
-    return;
+    return true;
   }
 
   // Create placeholder tile
@@ -395,6 +419,7 @@ void QMapTileWidget::loadTile(int x, int y, int z)
   request.setAttribute(QNetworkRequest::User, key);
 
   this->networkManager->get(request);
+  return false;
 }
 
 
@@ -435,6 +460,12 @@ void QMapTileWidget::keyPressEvent(QKeyEvent *event)
 
   case Qt::Key_F:
     this->showFps(!this->fpsRenderingLayer->isVisible());
+    break;
+
+  case Qt::Key_R:
+    this->mapCenter = this->initialCenter;
+    this->mapLevel = this->initialLevel;
+    this->updateView();
     break;
 
   default:
@@ -548,6 +579,11 @@ void QMapTileWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
   this->initGL();
 
   if (this->showMapEnabled) {
+    // Ensure proper rendering mode
+    painter->save();
+    painter->setRenderHint(QPainter::Antialiasing, false);
+    painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
+
     // Fill background
     painter->fillRect(this->rect(), QColor(229, 227, 223));
 
@@ -577,13 +613,26 @@ void QMapTileWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
         QString key = QString("%1_%2_%3").arg(this->mapLevel).arg(wrappedTx).arg(ty);
         MapTile *tile = this->tileCache.object(key);
 
+        // If tile not in memory cache, try to load from disk
+        if (!tile) {
+          if (loadTileFromDisk(wrappedTx, ty, this->mapLevel)) {
+            tile = this->tileCache.object(key);
+          }
+        }
+
         if (tile && !tile->pixmap.isNull()) {
           double x = offsetX + (tx - centerTileX) * 256;
           double y = offsetY + (ty - centerTileY) * 256;
+
+          // Draw tiles with reduced opacity for better data visibility
+          painter->setOpacity(0.4);
           painter->drawPixmap(QPointF(x, y), tile->pixmap);
+          painter->setOpacity(1.0);
         }
       }
     }
+
+    painter->restore();
   }
 
   // Draw rendering layers
