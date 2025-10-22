@@ -1,5 +1,5 @@
 #include "TripLocation.hpp"
-#include "QMapView.hpp"
+#include "QMapTileWidget.hpp"
 #include "geographicalviewwidget.h"
 #include "global.h"
 #include <QVector2D>

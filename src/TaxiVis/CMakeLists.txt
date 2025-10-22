@@ -15,25 +15,25 @@ set(QT_HEADERS
 #    HistogramDialog.hpp
 #    TemporalSeriesDialog.hpp
 #    TimeExplorationDialog.hpp
-#    QMapView.hpp
-#    QMapWidget.hpp
+    QMapTileWidget.hpp
+    QMapWidget.hpp
     coordinator.h
     extendedhistogram.h
     extendedplotwidget.h
-#    geographicalviewwidget.h
+    geographicalviewwidget.h
     histogramwidget.h
-#    layers/GridMap.hpp
-#    layers/HeatMap.hpp
-#    layers/TripAnimation.hpp
-#    layers/TripLocation.hpp
-#    layers/TripLocationLOD.hpp
+    layers/GridMap.hpp
+    layers/HeatMap.hpp
+    layers/TripAnimation.hpp
+    layers/TripLocation.hpp
+    layers/TripLocationLOD.hpp
     mainwindow.h
     qcustomplot.h
     scatterplotwidget.h
     temporalseriesplotwidget.h
     timeselectionwidget.h
     util/colorbar.h
-#    viewwidget.h
+    viewwidget.h
     timewidget.h
 )
 
@@ -58,23 +58,23 @@ set(SOURCES
 #    TimeExplorationDialog.cpp
     Group.cpp
     GroupRepository.cpp
-#    QMapView.cpp
-#    QMapWidget.cpp
+    QMapTileWidget.cpp
+    QMapWidget.cpp
     RenderingLayer.cpp
     Selection.cpp
     SelectionGraph.cpp
     coordinator.cpp
     extendedhistogram.cpp
     extendedplotwidget.cpp
-#    geographicalviewwidget.cpp
+    geographicalviewwidget.cpp
     global.cpp
     histogramwidget.cpp
-#    layers/GridMap.cpp
-#    layers/HeatMap.cpp
-#    layers/Triangulator.cpp
-#    layers/TripAnimation.cpp
-#    layers/TripLocation.cpp
-#    layers/TripLocationLOD.cpp
+    layers/GridMap.cpp
+    layers/HeatMap.cpp
+    layers/Triangulator.cpp
+    layers/TripAnimation.cpp
+    layers/TripLocation.cpp
+    layers/TripLocationLOD.cpp
     main.cpp
     mainwindow.cpp
     neighborhood.cpp
@@ -100,7 +100,7 @@ set(SOURCES
     util/scalar.cpp
     util/sequentialred.cpp
     util/yellowtobrownscale.cpp
-#    viewwidget.cpp
+    viewwidget.cpp
     timewidget.cpp
 #    timeanalysiswidget.cpp
 )
@@ -128,7 +128,6 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 find_package(Qt5 REQUIRED COMPONENTS Core Gui Widgets OpenGL Network PrintSupport)
-add_definitions(-DNO_WEBKIT)
 add_definitions(-DGL_SILENCE_DEPRECATION)
 
 # Generate Qt files (Qt5 handles most automatically with AUTOMOC/AUTOUIC/AUTORCC)

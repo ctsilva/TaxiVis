@@ -1,5 +1,5 @@
 #include "HeatMap.hpp"
-#include "QMapView.hpp"
+#include "QMapTileWidget.hpp"
 #include "global.h"
 #include "geographicalviewwidget.h"
 #include "util/colorbar.h"

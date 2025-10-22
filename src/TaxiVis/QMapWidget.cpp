@@ -1,5 +1,5 @@
 #include "QMapWidget.hpp"
-#include "QMapView.hpp"
+#include "QMapTileWidget.hpp"
 #include <QTimer>
 #include <QScrollBar>
 #include <QGraphicsScene>
@@ -7,9 +7,6 @@
 #include <QApplication>
 #include <QOpenGLWidget>
 #include <QSurfaceFormat>
-#ifndef NO_WEBKIT
-#include <QtWebKitWidgets/QWebSettings>
-#endif
 #include <stdio.h>
 #include <math.h>
 
@@ -42,13 +39,9 @@ void QMapWidget::initWidget(QPointF coords, int level)
   QGraphicsScene *scene = new QGraphicsScene(this);
   this->setScene(scene);
 
-  this->mView = new QMapView(coords, level, this);
+  this->mView = new QMapTileWidget(coords, level, this);
   scene->addItem(this->mView);
-#ifndef NO_WEBKIT
-  this->mView->setResizesToContents(false);
   this->mView->setFocus();
-  this->mView->settings()->globalSettings()->setAttribute(QWebSettings::PluginsEnabled, true);
-#endif
 }
 
 void QMapWidget::resizeEvent(QResizeEvent *event)

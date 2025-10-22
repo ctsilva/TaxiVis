@@ -1,5 +1,5 @@
 #include "GridMap.hpp"
-#include "QMapView.hpp"
+#include "QMapTileWidget.hpp"
 #include "Triangulator.hpp"
 #include "global.h"
 #include "geographicalviewwidget.h"

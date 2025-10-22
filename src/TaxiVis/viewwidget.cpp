@@ -4,7 +4,7 @@
 #include "TemporalSeriesDialog.hpp"
 #include "TimeExplorationDialog.hpp"
 #include "global.h"
-#include "QMapView.hpp"
+#include "QMapTileWidget.hpp"
 #include "coordinator.h"
 #include "timewidget.h"
 #include "GroupRepository.h"
@@ -14,6 +14,9 @@
 
 #include <QtCore>
 #include <QFileDialog>
+#include <QButtonGroup>
+#include <QMessageBox>
+#include <QProgressDialog>
 
 ViewWidget::ViewWidget(QWidget *parent) :
     QWidget(parent),
@@ -174,7 +177,7 @@ void ViewWidget::exportTrips()
         }
 
         //
-        std::ofstream out(filename.toAscii());
+        std::ofstream out(filename.toLatin1().constData());
         out << header.toStdString() << "\n";
 
         KdTrip::TripSet *trips = ui->geographicalView->getSelectedTrips();

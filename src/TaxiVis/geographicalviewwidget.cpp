@@ -1,6 +1,6 @@
 #include "geographicalviewwidget.h"
 #include "viewwidget.h"
-#include "QMapView.hpp"
+#include "QMapTileWidget.hpp"
 #include "global.h"
 #include "GroupRepository.h"
 #include "coordinator.h"
@@ -540,11 +540,11 @@ void GeographicalViewWidget::mousePressEvent(QMouseEvent *event){
     //cout << "GEO MOUSE PRESS EVENT" << endl;
 
     if (this->currentState == GeographicalViewWidget::POLYGON_SELECTION) {
-        if ((event->posF()-this->basePolygon.front()).manhattanLength()<10) {
+        if ((event->localPos()-this->basePolygon.front()).manhattanLength()<10) {
             this->basePolygon.pop_back();
             this->donePolygonSelection();
         } else {
-            this->basePolygon << event->posF();
+            this->basePolygon << event->localPos();
             this->selectionPath = QPainterPath();
             this->selectionPath.addPolygon(this->basePolygon);
         }
@@ -554,16 +554,16 @@ void GeographicalViewWidget::mousePressEvent(QMouseEvent *event){
 
     //pick edge
     SelectionGraphEdge* pickedEdge = NULL;
-    pickEdge(pickedEdge,event->posF());
+    pickEdge(pickedEdge,event->localPos());
 
     //
     SelectionGraphNode* sel = NULL;
-    pickSelection(sel,event->posF());
+    pickSelection(sel,event->localPos());
 
     if (this->currentState == GeographicalViewWidget::EDIT_SELECTION) {
         QMapWidget::mousePressEvent(event);
-        QGraphicsItem *item = this->scene()->itemAt(event->posF());
-        if (!(item->flags() & QGraphicsItem::ItemIsSelectable)) {
+        QGraphicsItem *item = this->scene()->itemAt(event->localPos(), QTransform());
+        if (item && !(item->flags() & QGraphicsItem::ItemIsSelectable)) {
             this->doneEditingSelection();
         }
         return;
@@ -602,7 +602,7 @@ void GeographicalViewWidget::mousePressEvent(QMouseEvent *event){
         }
         else {
             this->tailNode = sel;
-            this->projectedBasePosition = this->mapView()->mapToGeoLocation(event->posF());
+            this->projectedBasePosition = this->mapView()->mapToGeoLocation(event->localPos());
             this->projectedSelectionPath = this->tailNode->getSelection()->getGeometry();
             this->currentState = GeographicalViewWidget::MOVE_SELECTION;
         }
@@ -629,7 +629,7 @@ void GeographicalViewWidget::mousePressEvent(QMouseEvent *event){
             this->selectionPath = QPainterPath();
 
             this->basePolygon = QPolygonF();
-            this->basePolygon << event->posF() << event->posF();
+            this->basePolygon << event->localPos() << event->localPos();
         }
         // Free Selection
         else {
@@ -639,7 +639,7 @@ void GeographicalViewWidget::mousePressEvent(QMouseEvent *event){
 
             //
             selectionPath.moveTo(event->x(),event->y());
-            QPointF geoCoords = mapView()->mapToGeoLocation(event->posF());
+            QPointF geoCoords = mapView()->mapToGeoLocation(event->localPos());
             projectedSelectionPath.moveTo(geoCoords);
             currentState = GeographicalViewWidget::FREE_SELECTION;
         }
@@ -652,7 +652,7 @@ void GeographicalViewWidget::mousePressEvent(QMouseEvent *event){
 void GeographicalViewWidget::mouseMoveEvent(QMouseEvent *event){
 
     if (this->currentState==GeographicalViewWidget::MOVE_SELECTION) {
-        QPointF newCenter = this->mapView()->mapToGeoLocation(event->posF());
+        QPointF newCenter = this->mapView()->mapToGeoLocation(event->localPos());
         QPainterPath newPath = this->projectedSelectionPath.translated(newCenter-this->projectedBasePosition);
         (*this->tailNode->getSelection()) = Selection(newPath, this->tailNode->getSelection()->getType());
     }
@@ -682,12 +682,12 @@ void GeographicalViewWidget::mouseMoveEvent(QMouseEvent *event){
         }
         else if(currentState == GeographicalViewWidget::FREE_SELECTION){
             selectionPath.lineTo(event->x(),event->y());
-            QPointF geoCoords = mapView()->mapToGeoLocation(event->posF());
+            QPointF geoCoords = mapView()->mapToGeoLocation(event->localPos());
             projectedSelectionPath.lineTo(geoCoords);
         }
         else if(currentState == GeographicalViewWidget::POLYGON_SELECTION){
             this->basePolygon.pop_back();
-            this->basePolygon << event->posF();
+            this->basePolygon << event->localPos();
             this->selectionPath = QPainterPath();
             this->selectionPath.addPolygon(this->basePolygon);
         }
@@ -747,7 +747,7 @@ void GeographicalViewWidget::mouseReleaseEvent(QMouseEvent *event){
         }
     } else if (selectionMode == LINK) {
         SelectionGraphNode* headNode = NULL;
-        pickSelection(headNode, event->posF());
+        pickSelection(headNode, event->localPos());
 
         //
         if (tailNode!=NULL && headNode != NULL) {
@@ -1109,14 +1109,14 @@ void GeographicalViewWidget::mouseDoubleClickEvent(QMouseEvent *event){
     }
     //
     SelectionGraphEdge* pickedEdge = NULL;
-    pickEdge(pickedEdge,event->posF());
+    pickEdge(pickedEdge,event->localPos());
     if(pickedEdge != NULL){
         pickedEdge->toogleSelected();
         repaintContents();
     }
     else{
         SelectionGraphNode* sel = NULL;
-        pickSelection(sel,event->posF());
+        pickSelection(sel,event->localPos());
 
         // remove selection
         if(sel != NULL){

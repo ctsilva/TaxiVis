@@ -3,9 +3,7 @@
 //
 #include "global.h"
 #include "GroupRepository.h"
-#ifndef NO_WEBKIT
 #include "viewwidget.h"
-#endif
 
 #include <QtGui>
 #include <QMdiSubWindow>
@@ -27,10 +25,8 @@ MainWindow::MainWindow(QWidget *parent) :
     // QWidget::showMaximized();
 
     // for to start with one map
-#ifndef NO_WEBKIT
     addNewMap();
     ui->mdiArea->subWindowList().front()->showMaximized();
-#endif
 }
 
 MainWindow::~MainWindow()
@@ -43,11 +39,9 @@ void MainWindow::selectionChanged(){
 }
 
 void MainWindow::addNewMap() {
-#ifndef NO_WEBKIT
   ViewWidget *vw = new ViewWidget( this );
   QMdiSubWindow *sw = ui->mdiArea->addSubWindow( vw );
   sw->show();
 
   ui->mdiArea->tileSubWindows();
-#endif
 }

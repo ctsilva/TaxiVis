@@ -6,12 +6,9 @@
 #include <QSlider>
 #include <QGraphicsProxyWidget>
 #include <QOpenGLWidget>
-#ifndef NO_WEBKIT
-#include <QtWebKitWidgets/QGraphicsWebView>
-#endif
 #include <vector>
 
-class QMapView;
+class QMapTileWidget;
 class RenderingLayer;
 
 class QMapWidget : public QGraphicsView
@@ -22,7 +19,7 @@ public:
   QMapWidget(QPointF coords, int level=15, QWidget *parent=0);
   virtual ~QMapWidget() {}
 
-  QMapView *mapView() { return this->mView; }
+  QMapTileWidget *mapView() { return this->mView; }
   void repaintContents();
 
   virtual void loadFinished() {}
@@ -33,9 +30,9 @@ protected:
   void initWidget(QPointF coords, int level);
   void resizeEvent(QResizeEvent *event);
   void closeEvent(QCloseEvent *event);
-  
+
 private:
-  QMapView *mView;
+  QMapTileWidget *mView;
 };
 
 #endif

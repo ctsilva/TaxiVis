@@ -1,7 +1,7 @@
 #include "TripAnimation.hpp"
 #include "ui_TripAnimationConfig.h"
 #include "ui_TripAnimationToolBar.h"
-#include "QMapView.hpp"
+#include "QMapTileWidget.hpp"
 #include "CityMap.hpp"
 #include "geographicalviewwidget.h"
 #include "global.h"

@@ -8,7 +8,7 @@
 #include <QSet>
 
 class ViewWidget;
-class QMapView;
+class QMapTileWidget;
 class GeographicalViewWidget;
 
 class Coordinator : public QObject
@@ -25,7 +25,7 @@ public:
     bool containsView(ViewWidget *view);
     bool containsTimeSeries(TemporalSeriesPlotWidget *plot);
     bool containsHist(HistogramWidget *plot);
-    bool containsMapView(QMapView *mw);
+    bool containsMapView(QMapTileWidget *mw);
 
     void notifyAll();
     void notifyCameraChangeAll();
@@ -39,7 +39,7 @@ public:
     void stepBackward(int mins);
     void stepForward(int mins);
 
-    QSet<QMapView*> linkedMapViews() { return _linkedMapViews; }
+    QSet<QMapTileWidget*> linkedMapViews() { return _linkedMapViews; }
     QSet<GeographicalViewWidget*> linkedMapWidgets() { return _linkedMapWidgets; }
 
     bool isEnabled();
@@ -51,7 +51,7 @@ private:
 
     QSet<ViewWidget *> _linkedViews;
     QSet<TemporalSeriesPlotWidget *> _linkedPlots;
-    QSet<QMapView *> _linkedMapViews;
+    QSet<QMapTileWidget *> _linkedMapViews;
     QSet<GeographicalViewWidget *> _linkedMapWidgets;
     QSet<HistogramWidget *> _linkedHists;
 
