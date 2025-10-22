@@ -1,8 +1,9 @@
 #include "viewwidget.h"
 #include "ui_viewwidget.h"
-#include "HistogramDialog.hpp"
-#include "TemporalSeriesDialog.hpp"
-#include "TimeExplorationDialog.hpp"
+// Dialogs temporarily disabled until they are migrated to Qt5
+// #include "HistogramDialog.hpp"
+// #include "TemporalSeriesDialog.hpp"
+// #include "TimeExplorationDialog.hpp"
 #include "global.h"
 #include "QMapTileWidget.hpp"
 #include "coordinator.h"
@@ -258,6 +259,9 @@ void ViewWidget::on_syncButton_clicked(bool checked)
 
 void ViewWidget::plotAllAttributes()
 {
+  // Dialogs temporarily disabled until migrated to Qt5
+  // TODO: Re-enable after migrating dialog classes
+  /*
   if (this->ui->tabWidget->currentWidget()==this->ui->timeSeriesWidget) {
     int numBins = this->ui->timeSeriesWidget->getNumberOfBins();
     TemporalSeriesDialog *dialog = new TemporalSeriesDialog(this->ui->geographicalView, numBins);
@@ -273,6 +277,7 @@ void ViewWidget::plotAllAttributes()
     dialog->setAttribute(Qt::WA_DeleteOnClose, true);
     dialog->show();
   }
+  */
 }
 
 void ViewWidget::updateRecurrentTimes(TimeWidget *widget)
@@ -283,7 +288,11 @@ void ViewWidget::updateRecurrentTimes(TimeWidget *widget)
 
 void ViewWidget::exploreInTime(const DateTimeList &timeRanges)
 {
-
+  // Dialogs temporarily disabled until migrated to Qt5
+  // TODO: Re-enable after migrating dialog classes
+  Q_UNUSED(timeRanges);
+  return;
+  /*
   if (timeRanges.count()>7) {
     if (QMessageBox::question(this, "Parameter Exploration",
                               QString("There will be a lot of results, %1 cells. Do you still want to proceed?" )
@@ -372,4 +381,5 @@ void ViewWidget::exploreInTime(const DateTimeList &timeRanges)
   //
   dialog->exec();
   delete dialog;
+  */
 }

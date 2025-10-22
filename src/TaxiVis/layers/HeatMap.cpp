@@ -1,3 +1,4 @@
+#include <GL/glew.h>
 #include "HeatMap.hpp"
 #include "QMapTileWidget.hpp"
 #include "global.h"
@@ -5,6 +6,11 @@
 #include "util/colorbar.h"
 #include "util/heatedobjectscale.h"
 #include <QVector2D>
+
+// Qt's OpenGL headers undef GLEW macros, so we need to redefine them
+#ifndef glBindBuffer
+#define glBindBuffer __glewBindBuffer
+#endif
 
 HeatMap::HeatMap(GeographicalViewWidget *gw) :
     RenderingLayer(false),

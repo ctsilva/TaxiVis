@@ -1,9 +1,15 @@
+#include <GL/glew.h>
 #include "TripLocation.hpp"
 #include "QMapTileWidget.hpp"
 #include "geographicalviewwidget.h"
 #include "global.h"
 #include <QVector2D>
 #include <QOpenGLShaderProgram>
+
+// Qt's OpenGL headers undef GLEW macros, so we need to redefine them
+#ifndef glBindBuffer
+#define glBindBuffer __glewBindBuffer
+#endif
 
 TripLocation::TripLocation(GeographicalViewWidget *gw) :
     dataReady(false),
@@ -66,10 +72,10 @@ void TripLocation::initGL()
 {
   glewInit();
   this->glBuffer.generate();
-  const QGLContext *context = QGLContext::currentContext();
+  const QOpenGLContext *context = QOpenGLContext::currentContext();
   if (context) {
-    this->shader = PQOpenGLShaderProgram(new QOpenGLShaderProgram(context));
-    this->shader->addShaderFromSourceFile(QGLShader::Vertex, ":/Resources/shaders/location.120.vert");
+    this->shader = PQOpenGLShaderProgram(new QOpenGLShaderProgram());
+    this->shader->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/Resources/shaders/location.120.vert");
     this->shader->link();
   }
 }

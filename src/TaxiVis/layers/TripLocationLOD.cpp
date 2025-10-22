@@ -1,3 +1,4 @@
+#include <GL/glew.h>
 #include "TripLocationLOD.hpp"
 #include "QMapTileWidget.hpp"
 #include "geographicalviewwidget.h"
@@ -5,6 +6,11 @@
 #include <QVector2D>
 #include <QOpenGLShaderProgram>
 #include <queue>
+
+// Qt's OpenGL headers undef GLEW macros, so we need to redefine them
+#ifndef glBindBuffer
+#define glBindBuffer __glewBindBuffer
+#endif
 
 TripLocationLOD::TripLocationLOD(GeographicalViewWidget *gw)
     : TripLocation(gw), lod(true)

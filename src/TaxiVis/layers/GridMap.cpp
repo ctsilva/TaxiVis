@@ -1,3 +1,4 @@
+#include <GL/glew.h>
 #include "GridMap.hpp"
 #include "QMapTileWidget.hpp"
 #include "Triangulator.hpp"
@@ -9,6 +10,13 @@
 #include <QCursor>
 #include <QGraphicsItem>
 #include <QOpenGLShaderProgram>
+#include <QOpenGLContext>
+#include <QOpenGLFunctions>
+
+// Qt's OpenGL headers undef GLEW macros, so we need to redefine them
+#ifndef glBindBuffer
+#define glBindBuffer __glewBindBuffer
+#endif
 
 struct Grid {
   size_t size() {
@@ -227,10 +235,10 @@ void GridMap::initGL()
   this->buffer[0].generate();
   this->buffer[1].generate();
   this->buffer[2].generate();
-  const QGLContext *context = QGLContext::currentContext();
+  QOpenGLContext *context = QOpenGLContext::currentContext();
   if (context) {
-    this->shader = PQOpenGLShaderProgram(new QOpenGLShaderProgram(context));
-    this->shader->addShaderFromSourceFile(QGLShader::Vertex, ":/Resources/shaders/geo2screen.120.vert");
+    this->shader = PQOpenGLShaderProgram(new QOpenGLShaderProgram());
+    this->shader->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/Resources/shaders/geo2screen.120.vert");
     this->shader->link();
     this->fbo = PQOpenGLFramebufferObject(new QOpenGLFramebufferObject(1024, 1024));
   }

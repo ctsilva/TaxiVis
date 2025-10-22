@@ -1,3 +1,4 @@
+#include <GL/glew.h>
 #include "TripAnimation.hpp"
 #include "ui_TripAnimationConfig.h"
 #include "ui_TripAnimationToolBar.h"
@@ -15,6 +16,11 @@
 #include <QToolBar>
 #include <QToolButton>
 #include <QOpenGLShaderProgram>
+
+// Qt's OpenGL headers undef GLEW macros, so we need to redefine them
+#ifndef glBindBuffer
+#define glBindBuffer __glewBindBuffer
+#endif
 
 TripAnimation::TripAnimation(GeographicalViewWidget *gw) :
     RenderingLayer(false),
@@ -248,15 +254,16 @@ void TripAnimation::initGL()
   this->bufPath[0].generate();
   this->bufPath[1].generate();
 
-  const QGLContext *context = QGLContext::currentContext();
+  const QOpenGLContext *context = QOpenGLContext::currentContext();
   if (context) {
-    PQOpenGLShaderProgram sh = PQOpenGLShaderProgram(new QOpenGLShaderProgram(context));
+    PQOpenGLShaderProgram sh = PQOpenGLShaderProgram(new QOpenGLShaderProgram());
     this->shaders.push_back(sh);
-    sh->addShaderFromSourceFile(QGLShader::Vertex, ":/Resources/shaders/paths.120.vert");
-    sh->addShaderFromSourceFile(QGLShader::Geometry, ":/Resources/shaders/paths.120.geom");
-    sh->addShaderFromSourceFile(QGLShader::Fragment, ":/Resources/shaders/paths.120.frag");
-    sh->setGeometryInputType(GL_TRIANGLES);
-    sh->setGeometryOutputType(GL_TRIANGLE_STRIP);
+    sh->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/Resources/shaders/paths.120.vert");
+    sh->addShaderFromSourceFile(QOpenGLShader::Geometry, ":/Resources/shaders/paths.120.geom");
+    sh->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/Resources/shaders/paths.120.frag");
+    // Note: setGeometryInputType/OutputType removed in Qt5 - configure in shader instead
+    // sh->setGeometryInputType(GL_TRIANGLES);
+    // sh->setGeometryOutputType(GL_TRIANGLE_STRIP);
     sh->link();
   }
 
