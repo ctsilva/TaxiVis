@@ -3,6 +3,35 @@
 using CSV
 using DataFrames
 
+# Read the time columns as text, so that the merged CSV keeps their original
+# format with any CSV.jl version (>= 1.0 parses them into its own type).
+# Keys are the stripped header names (stripwhitespace=true strips them).
+const TIME_COLUMNS = ("pickup_datetime", "dropoff_datetime")
+function time_columns_as_string(path)
+    header = split(readline(path), ',')
+    return Dict{Symbol, Type}(Symbol(strip(h)) => String for h in header if strip(h) in TIME_COLUMNS)
+end
+
+const KEYS = [:medallion, :hack_license, :vendor_id, :pickup_datetime]
+
+"""
+Trips and fares side by side. The 2013 TLC trip and fare files are aligned line
+by line: when every row's key matches, pair rows by position. Joining on the key
+would multiply rows whose key repeats (April 2013: 652 keys shared by distinct
+trips, +1,304 rows; August: +4,028). Otherwise, join on the key and report
+repeated keys.
+"""
+function merge_trips_fares(trips, fares)
+    if nrow(trips) == nrow(fares) && all(all(trips[!, k] .== fares[!, k]) for k in KEYS)
+        println("Trip and fare files are aligned: merging by position")
+        return hcat(trips, select(fares, Not(KEYS)))
+    end
+    repeated = nrow(trips) - nrow(unique(trips[!, KEYS]))
+    repeated > 0 && println("Warning: $repeated trip rows repeat a key; the join multiplies them")
+    println("Trip and fare files are not aligned: joining on $(KEYS)")
+    return innerjoin(trips, fares, on = KEYS)
+end
+
 function main()
     if length(ARGS) != 3
         println("Usage: julia -t auto merge.jl <trips data> <fare data> <output file>")
@@ -21,6 +50,7 @@ function main()
     flush(stdout)
     trips = CSV.read(trip_file, DataFrame,
                      stripwhitespace=true,
+                     types=time_columns_as_string(trip_file),
                      buffer_in_memory=true,
                      ntasks=Threads.nthreads())
 
@@ -28,6 +58,7 @@ function main()
     flush(stdout)
     fares = CSV.read(fare_file, DataFrame,
                      stripwhitespace=true,
+                     types=time_columns_as_string(fare_file),
                      buffer_in_memory=true,
                      ntasks=Threads.nthreads())
 
@@ -39,9 +70,7 @@ function main()
     rename!(fares, strip.(names(fares)))
 
     println("Merging data...")
-    # Merge on medallion, hack_license, vendor_id, and pickup_datetime
-    merged = innerjoin(trips, fares,
-                       on = [:medallion, :hack_license, :vendor_id, :pickup_datetime])
+    merged = merge_trips_fares(trips, fares)
 
     println("Merged: $(nrow(merged)) rows")
 

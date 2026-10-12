@@ -203,6 +203,17 @@ environment so that dates and hours in the application match the raw data:
 TZ=America/New_York julia -t 16 src/preprocess/csv2Binary_mt.jl ...
 ```
 
+**Merging and out-of-range values.** The 2013 trip and fare files of a month
+are aligned line by line; `merge.jl` checks this (every row's medallion, hack
+license, vendor and pickup time must match) and then pairs rows by position.
+Joining on that key instead would multiply rows whose key repeats: April and
+August 2013 have distinct trips sharing a key (+1,304 and +4,028 rows with a
+join). If the files are not aligned, `merge.jl` falls back to the join and
+reports repeated keys. `csv2Binary_mt.jl` clamps distances and amounts to the
+binary format's maximum (655.35, stored in hundredths in 16 bits); August 2013
+has 349 trips with corrupt distances above it. Both scripts read the time
+columns as text and work with CSV.jl 0.10 and 1.x.
+
 **Automated script.** `process_taxi_data.sh` runs the same three steps with
 timing output, but its input and output paths are hard-coded: it expects
 `data/2012_trip_data_1.csv` and `data/2012_trip_fare_1.csv` and writes

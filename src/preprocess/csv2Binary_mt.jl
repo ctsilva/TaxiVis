@@ -37,6 +37,22 @@ function local_unix(dt::DateTime)
     return ccall(:mktime, Int, (Ref{Libc.TmStruct},), tm)
 end
 
+# Read the time columns as text: CSV.jl >= 1.0 would otherwise parse them into
+# its own timestamp type, which DateTime(str, format) below does not accept.
+# Keys are the stripped header names (stripwhitespace=true strips them).
+const TIME_COLUMNS = ("pickup_datetime", "dropoff_datetime", "pickup_time", "dropoff_time")
+function time_columns_as_string(path)
+    header = split(readline(path), ',')
+    return Dict{Symbol, Type}(Symbol(strip(h)) => String for h in header if strip(h) in TIME_COLUMNS)
+end
+
+# Saturate to the binary format's integer fields: distances and amounts are
+# UInt16 hundredths (at most 655.35), passengers UInt8. A few raw records are
+# corrupt (August 2013: 349 trips with distances up to 5,005,073 miles), which
+# UInt16() would reject.
+sat16(x) = UInt16(clamp(x, 0, typemax(UInt16)))
+sat8(x) = UInt8(clamp(x, 0, typemax(UInt8)))
+
 function parse_datetime_to_unix(dt_str)
     dt = DateTime(dt_str, "yyyy-mm-dd HH:MM:SS")
     return UInt32(local_unix(dt))
@@ -59,6 +75,7 @@ function main()
     flush(stdout)
     df = CSV.read(input_file, DataFrame,
                   stripwhitespace=true,
+                  types=time_columns_as_string(input_file),
                   ntasks=Threads.nthreads())
 
     n_trips = nrow(df)
@@ -119,14 +136,14 @@ function main()
             UInt32(coalesce(row.field3, 0)),
             UInt32(coalesce(row.field4, 0)),
             id_taxi,
-            UInt16(round(coalesce(row.distance, 0.0) * 100)),
-            UInt16(round(coalesce(row.fare_amount, 0.0) * 100)),
-            UInt16(round(coalesce(row.surcharge, 0.0) * 100)),
-            UInt16(round(coalesce(row.mta_tax, 0.0) * 100)),
-            UInt16(round(coalesce(row.tip_amount, 0.0) * 100)),
-            UInt16(round(coalesce(row.tolls_amount, 0.0) * 100)),
+            sat16(round(coalesce(row.distance, 0.0) * 100)),
+            sat16(round(coalesce(row.fare_amount, 0.0) * 100)),
+            sat16(round(coalesce(row.surcharge, 0.0) * 100)),
+            sat16(round(coalesce(row.mta_tax, 0.0) * 100)),
+            sat16(round(coalesce(row.tip_amount, 0.0) * 100)),
+            sat16(round(coalesce(row.tolls_amount, 0.0) * 100)),
             payment_type,
-            UInt8(coalesce(row.passengers, 0))
+            sat8(coalesce(row.passengers, 0))
         )
     end
 
